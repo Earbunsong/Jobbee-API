@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const errorMiddleware = require('./middlewares/error')
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 //import database connection
 const connectDatabase = require("./config/database");
 const errorhandle = require("./utils/errorhandle");
@@ -18,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //import all route
 const jobs = require("./routes/jobs");
 const auth = require("./routes/auth");
+const users = require("./routes/users")
 
 //middleware
 
@@ -32,7 +34,7 @@ const middleware = (req, res, next) => {
 app.use(middleware);
 app.use("/api/v1/job", jobs);
 app.use("/api/v1/auth", auth);
-// app.use("/api/v1/users", users)
+app.use("/api/v1/users", users)
 
 app.all("*", (req, res, next) => {
   next(new errorhandle(`${req.originalUrl} route not found`, 404));
@@ -41,6 +43,8 @@ app.all("*", (req, res, next) => {
 // set cookin parser
 app.use(cookieParser());
 
+// handle file upload
+app.use(fileUpload());
 
 app.use(errorMiddleware);
 

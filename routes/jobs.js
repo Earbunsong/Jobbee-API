@@ -8,20 +8,23 @@ const {getJobs,
        newJob,
        getJobInRadius,
        updateJob,
-       deleteJob
-
-
+       deleteJob,
+       applyToJob
 } = require('../controller/JobController')
 
 const {isAuthenticationUser, authorizeRoles} = require('../middlewares/auth');
 
 router.route('/jobs').get(getJobs);
-router.route('/jobs/:zipcode/:distance').get(getJobInRadius);
+router.route('/jobs/:zipcode/:distance').get(isAuthenticationUser, authorizeRoles,getJobInRadius);
 router.route('/new').post(isAuthenticationUser,authorizeRoles('employee','admin'),newJob);
-router.route('/update').put(updateJob).delete(deleteJob);
+router.route('/update').put(isAuthenticationUser, authorizeRoles,updateJob).delete(isAuthenticationUser, authorizeRoles,deleteJob);
 router.route('/job/:id')
        .put(isAuthenticationUser,authorizeRoles('employee','admin'),updateJob)
        .delete(isAuthenticationUser,authorizeRoles('employee','admin'),deleteJob)
+router.route('/jobs/:id/apply').put(isAuthenticationUser,authorizeRoles('employee','admin'),applyToJob);
+
+
+
 
 // router.get('/jobs',(req,res)=>{
 //      res.status(200).json({

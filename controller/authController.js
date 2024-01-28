@@ -105,12 +105,55 @@ const loginUser = catchAsyncErrors ( async (req, res, next) => {
       return next(new errorhandle(error.message, 500))
 
     }
-
-
+  
  });
+// reset password
+const resetPassword = catchAsyncErrors(async (req, res, next) => {
+    
+  const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+  const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+      return next(new ErrorHandler("Password Reset token is invalid.", 400))
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordExpire = undefined;
+  user.resetPasswordToken = undefined;
+
+  await user.save();
+
+
+  sendToken(user, 200, res, req);
+})
+
+
+// Logout user => /api/v1/logout
+const logout = catchAsyncErrors(async (req, res, next) => {
+
+  res.cookie("token", 'none', {
+      expires: new Date(Date.now()),
+      httpOnly: true
+  });
+
+  res.status(200).json({
+      success: true,
+      message: "Logged out successfully."
+  })
+})
 
 //compare this snippet from controller/jobs.js
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  forgotPassword,
+  resetPassword,
+  logout
 };
