@@ -5,6 +5,12 @@ const dotenv = require("dotenv");
 const errorMiddleware = require('./middlewares/error')
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const cors = require('cors');
 //import database connection
 const connectDatabase = require("./config/database");
 const errorhandle = require("./utils/errorhandle");
@@ -45,6 +51,48 @@ app.use(cookieParser());
 
 // handle file upload
 app.use(fileUpload());
+
+//set up security headers
+app.use(helmet());
+
+// rate limiting 
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100 // 100 request per 10 minutes
+});
+app.use(limiter);
+
+// sanitize data
+app.use(mongoSanitize());
+
+// prevent xss attack
+app.use(xss());
+
+// prevent http param pollution
+app.use(hpp(
+  {
+    whitelist: [
+      'positions',
+      'location',
+      'description',
+      'requirements',
+      'salary',
+      'company',
+      'address',
+      'email',
+      'phone',
+      'jobType',
+      'website',
+      'createdAt',
+      'updatedAt'
+    ]
+  }
+));
+
+// enable cors
+app.use(cors());
+
+app.use(express.static('public'));
 
 app.use(errorMiddleware);
 

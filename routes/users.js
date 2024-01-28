@@ -8,7 +8,8 @@ const {getUsers,
     updatePassword,
     updateUser,
     deleteUser,
-    getUerProfile
+    getUerProfile,
+    getAppliedJobs
     } = require('../controller/userContoller');
 const {isAuthenticationUser,authorizeRoles} = require('../middlewares/auth');
 
@@ -18,5 +19,5 @@ router.route("/password/update").put(isAuthenticationUser,updatePassword);
 router.route("/users/update").put(isAuthenticationUser,updateUser);
 router.route("/users/delete").delete(isAuthenticationUser,deleteUser);
 router.route("/users/profile").get(isAuthenticationUser,getUerProfile);
-
+// router.route("/jobs/applied").get(getAppliedJobs);
 module.exports= router;

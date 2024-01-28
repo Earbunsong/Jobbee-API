@@ -2,7 +2,7 @@ const User = require('../model/users');
 const errorhandle = require('../utils/errorhandle');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const sendToken = require('../utils/jwtToken');
-
+const fs = require('fs');
 
 // Get all users => /api/v1/users
 const getUsers = catchAsyncErrors(async(req,res,next) => {
@@ -79,6 +79,7 @@ const updateUser = catchAsyncErrors(async(req, res, next)=>{
 const deleteUser = catchAsyncErrors(async (req, res, next) => {
      const user = await User.findByIdAndDelete(req.params.id);
 
+
      res.cookie("token","none",{
         expries : new Date(Date.now()),
         httpOnly : true
@@ -88,6 +89,51 @@ const deleteUser = catchAsyncErrors(async (req, res, next) => {
             message : "User has been deleted"
      })
 });    
+
+async function deleteUserData(user,role){
+
+    deleteUserData(req.user.id, req.user.roles)
+
+    if(role === "employee"){
+        await Job.deleteMany({user : user._id});
+    }
+    if(role === "user"){
+        const appliedJob = await Job.find({'applicantsApplied' : user}).select('+applicantsApplied');
+
+        for(let i=0; i<appliedJob.length; i++){
+            let obj = appliedJob[i].applicantsApplied.find(o => o.id ===
+                user);
+
+                 console.log(__dirname)
+                let filepath = `${__dirname}/public/${obj.resume}`.replace
+                ('\\controller','');
+
+                fs.unlink(filepath, err => {
+                    if(err) return console.log(err);
+                });
+
+
+            appliedJob[i].applicantsApplied.splice(appliedJob[i]).
+            applicantsApplied.indexOf(obj.id);
+
+
+            appliedJob[i].save();
+        }
+    }
+}
+
+//show all applied jobs => /api/v1/user/appliedjobs
+exports.getAppliedJobs =  catchAsyncErrors(async(req,res,next) => {
+   const jobs = await Job.find({'applicantsApplied.id' : req.user.id}).select
+   (+'applicantsApplied');
+
+   res.status(200).json({
+    success : true,
+    result : jobs.length,
+    data : jobs
+   })
+})
+
 module.exports = {
     getUsers,
     getUserById,

@@ -167,7 +167,7 @@ exports.newJob = catchAsyncErrors(async (req, res, next) => {
 // Apply to job using resume => api/v1/job/:id/apply
 exports.applyToJob = catchAsyncErrors(async (req, res, next) => {
 
-  let job = await Job.findById(req.params.id);
+  let job = await Job.findById(req.params.id).select('+applicantsApplied');
 
   if (!job) {
     return next(new ErrorHandler("Job not found", 404));
@@ -192,6 +192,22 @@ exports.applyToJob = catchAsyncErrors(async (req, res, next) => {
   if(file.size > process.env.MAX_FILE_UPLOAD){
     return next(new ErrorHandler("Please upload your file less than 2MB", 400)
     );
+  }
+
+  // check if user has applied before
+  for(let i = 0; i < job.applicantsApplied.length; i++){
+    if(job.applicantsApplied[i].id == req.user.id){
+      return next(new ErrorHandler("You have already applied this job", 400));
+    }
+  }
+
+
+  job = await Job.find({ 'applicantsApplied.id' : req.user.id}).select(
+
+  + 'applicantsApplied'); 
+
+  if(job){
+    return next(new ErrorHandler("You have already applied this job", 400));
   }
 
   // Renaming resume
