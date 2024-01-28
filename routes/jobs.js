@@ -1,5 +1,4 @@
 const express = require('express');
-
 const router = express.Router();
 
 // import jobs controller methods
@@ -14,14 +13,30 @@ const {getJobs,
 
 const {isAuthenticationUser, authorizeRoles} = require('../middlewares/auth');
 
-router.route('/jobs').get(getJobs);
-router.route('/jobs/:zipcode/:distance').get(isAuthenticationUser, authorizeRoles,getJobInRadius);
-router.route('/new').post(isAuthenticationUser,authorizeRoles('employee','admin'),newJob);
-router.route('/update').put(isAuthenticationUser, authorizeRoles,updateJob).delete(isAuthenticationUser, authorizeRoles,deleteJob);
+router.route('/jobs')
+.get(isAuthenticationUser,getJobs);
+
+
+router.route('/jobs/:zipcode/:distance')
+.get(isAuthenticationUser, authorizeRoles,getJobInRadius);
+
+
+router.route('/new')
+.post(isAuthenticationUser,authorizeRoles('employee','admin'),newJob);
+
+
+router.route('/update')
+.put(updateJob)
+.delete(deleteJob);
+
+
 router.route('/job/:id')
-       .put(isAuthenticationUser,authorizeRoles('employee','admin'),updateJob)
-       .delete(isAuthenticationUser,authorizeRoles('employee','admin'),deleteJob)
-router.route('/jobs/:id/apply').put(isAuthenticationUser,authorizeRoles('employee','admin'),applyToJob);
+       .put(updateJob)
+       .delete(deleteJob)
+
+
+router.route('/jobs/:id/apply')
+.put(isAuthenticationUser,authorizeRoles('employee','admin'),applyToJob);
 
 
 

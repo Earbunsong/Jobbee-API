@@ -14,9 +14,9 @@ const {isAuthenticationUser,authorizeRoles} = require('../middlewares/auth');
 
 router.route('/users').get(isAuthenticationUser,getUsers);
 //GET /api/users/:id  Get user by id
-router.route("/password/update").put(isAuthenticationUser,authorizeRoles,updatePassword);
-router.route("/users/update").put(isAuthenticationUser,authorizeRoles,updateUser);
-router.route("/users/delete").delete(isAuthenticationUser,authorizeRoles,deleteUser);
-router.route("/users/profile").get(isAuthenticationUser,authorizeRoles,getUerProfile);
+router.route("/password/update").put(isAuthenticationUser,updatePassword);
+router.route("/users/update").put(isAuthenticationUser,updateUser);
+router.route("/users/delete").delete(isAuthenticationUser,deleteUser);
+router.route("/users/profile").get(isAuthenticationUser,getUerProfile);
 
 module.exports= router;

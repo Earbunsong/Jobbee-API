@@ -11,10 +11,10 @@ const { registerUser,
 const {isAuthenticationUser, authorizeRoles} = require('../middlewares/auth');
 
 router.route("/register").post(registerUser);
-router.route("/login").post(isAuthenticationUser,authorizeRoles,loginUser);
-router.route('/password/forgot').post(isAuthenticationUser,authorizeRoles,forgotPassword);
-router.route('/password/reset/:token').put(isAuthenticationUser,authorizeRoles,resetPassword);
-router.route('/logout').get(isAuthenticationUser,authorizeRoles,authorizeRoles,logout);
+router.route("/login").post(loginUser);
+router.route('/password/forgot').post(forgotPassword);
+router.route('/password/reset/:token').put(resetPassword);
+router.route('/logout').get(logout);
 
 
 module.exports = router;
